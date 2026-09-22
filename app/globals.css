@@ -1,0 +1,275 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --edge: clamp(1.25rem, 5vw, 5.5rem);
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Nav is fixed — keep anchored sections from hiding underneath it. */
+    scroll-padding-top: 5.5rem;
+    /* Firefox scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #26251f #0b0b0b;
+  }
+
+  body {
+    @apply bg-ink text-ivory font-sans antialiased;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    @apply bg-red text-ivory;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display uppercase;
+    letter-spacing: -0.03em;
+    line-height: 0.86;
+  }
+
+  /* Visible, on-brand focus ring for keyboard users only. */
+  :focus-visible {
+    outline: 2px solid #c8271f;
+    outline-offset: 3px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b0b0b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #26251f;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #c8271f;
+  }
+}
+
+@layer components {
+  /* ---------- Layout ---------- */
+  .edge {
+    padding-left: var(--edge);
+    padding-right: var(--edge);
+  }
+
+  .section {
+    @apply relative;
+    padding-top: clamp(5rem, 11vw, 10.5rem);
+    padding-bottom: clamp(5rem, 11vw, 10.5rem);
+  }
+
+  .rule {
+    @apply block h-px w-full bg-current opacity-20;
+  }
+
+  /* ---------- Type scale ---------- */
+  .t-mega {
+    font-size: clamp(3.4rem, 15.5vw, 15rem);
+    line-height: 0.82;
+  }
+
+  .t-display {
+    font-size: clamp(2.6rem, 9vw, 8.5rem);
+    line-height: 0.85;
+  }
+
+  .t-section {
+    font-size: clamp(2.2rem, 7.5vw, 6.5rem);
+    line-height: 0.86;
+  }
+
+  .t-stat {
+    font-size: clamp(3rem, 8.5vw, 7.5rem);
+    line-height: 0.8;
+  }
+
+  .t-lead {
+    font-size: clamp(1.0625rem, 1.65vw, 1.375rem);
+    line-height: 1.55;
+  }
+
+  .label {
+    @apply font-sans text-[0.6875rem] font-medium uppercase tracking-label;
+  }
+
+  /* ---------- Interaction primitives ---------- */
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.18em;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Filled pill CTA that inverts on hover via a sliding panel, not a colour flip. */
+  .btn {
+    @apply relative inline-flex items-center gap-3 overflow-hidden border px-7 py-4 font-sans text-[0.6875rem] font-medium uppercase tracking-label;
+    transition: color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Not currentColor: the text colour flips on hover, which would make the
+       panel and the label the same colour and hide the text. */
+    background: var(--btn-fill, #f4f1ea);
+    transform: translateY(101%);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 0;
+  }
+  .btn:hover::before,
+  .btn:focus-visible::before {
+    transform: translateY(0);
+  }
+  .btn > * {
+    position: relative;
+    z-index: 1;
+  }
+  .btn-onInk {
+    @apply border-ivory/30 text-ivory;
+    --btn-fill: #f4f1ea;
+  }
+  .btn-onInk:hover,
+  .btn-onInk:focus-visible {
+    @apply text-ink;
+  }
+  .btn-red {
+    @apply border-red text-red;
+    --btn-fill: #c8271f;
+  }
+  .btn-red:hover,
+  .btn-red:focus-visible {
+    @apply text-ivory;
+  }
+
+  /* ---------- Scroll reveal (driven by components/Reveal.tsx) ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Line-by-line masked text reveal. */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+  }
+  .line-mask > span {
+    display: block;
+    transform: translateY(105%);
+    transition: transform 1.05s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .is-in > .line-mask > span,
+  .line-mask.is-in > span {
+    transform: none;
+  }
+
+  /* Image reveal: the frame wipes open, the image settles back from a slight zoom. */
+  .img-reveal {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1.15s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  .img-reveal.is-in {
+    clip-path: inset(0 0 0 0);
+  }
+  .img-zoom {
+    transform: scale(1.14);
+    transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .is-in .img-zoom {
+    transform: scale(1);
+  }
+
+  .marquee-mask {
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .scroll-x {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-x::-webkit-scrollbar {
+    display: none;
+  }
+
+  .noise::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@layer utilities {
+  .writing-vertical {
+    writing-mode: vertical-rl;
+  }
+}
+
+/* Respect the OS-level motion preference: hold every animated element in its
+   final state rather than animating it. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .line-mask > span {
+    transform: none !important;
+  }
+  .img-reveal {
+    clip-path: none !important;
+  }
+  .img-zoom {
+    transform: none !important;
+  }
+}

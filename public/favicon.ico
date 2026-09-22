@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" fill="#0B0B0B"/>
+  <rect x="0" y="0" width="64" height="3" fill="#C8271F"/>
+  <text x="32" y="45"
+        font-family="Arial Narrow, Helvetica Neue, Arial, sans-serif"
+        font-size="34" font-weight="700" letter-spacing="-1"
+        text-anchor="middle" fill="#F4F1EA">SS</text>
+</svg>
